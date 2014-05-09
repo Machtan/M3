@@ -28,6 +28,9 @@ public class Building : MonoBehaviour {
 
 				t.parent = transform;
 			}
+
+		Colider p = gameObject.AddComponent("Colider")as Colider;
+
 	}
 	
 	// Update is called once per frame
