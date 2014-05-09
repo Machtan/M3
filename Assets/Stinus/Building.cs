@@ -21,12 +21,11 @@ public class Building : MonoBehaviour {
 			for(int j = 0; j < height; j++)
 			{
 				Transform t = Instantiate(BuildingBlock,
-			            transform.position + new Vector3(	(float)(i * blockSide),
-			                                 				((float)(j * blockSide)),
-			                                 				0),
+			            transform.position + new Vector3(	(float)(i * blockSide) + (float)blockSide / 2f,
+			                                 				(float)(j * blockSide) + (float)blockSide / 2f,
+			                                 					0),
 			            transform.rotation)as Transform;
 
-				t.gameObject.GetComponent<Rigidbody2D>().isKinematic = true;
 				t.parent = transform;
 			}
 	}

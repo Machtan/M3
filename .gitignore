@@ -4,3 +4,7 @@
 *.csproj
 *.sln
 *.pxi
+*.pxa
+*.pxi.meta
+*.pxa.meta
+*.meta
