@@ -1,8 +1,10 @@
 
 
-from simplegame import Game, Transform, Axis, Animation, Sprite, Loader, MouseListener
+from simplegame import Game, Transform, Axis, Animation, Sprite
+from simplegame import Loader, MouseListener, Clear
 from simplegame import Vector
-from upgrade import LaserEyes
+from upgrade import Upgrade
+from rotation import Rotatable
 import random
 import pygame
 import os
@@ -16,13 +18,37 @@ class DestructibleBlock(Sprite):
     def damage(self, amount, pos):
         if not self.destroyed:
             self.image = Loader.load_image("brokenwindow")
-            self.destroyed = True
+
+class Laser(Rotatable):
+    def __init__(self, start, end, duration=0.1):
+        self.layer = 1
+        extent = end - start
+        middle = start + extent * 0.5
+        img = Loader.load_image("laser")
+        length = int(math.floor(extent.length))
+        source = Clear((length, 8))
+        for i in range(length):
+            pos = (i*16, 0)
+            source.blit(img, pos)
+        self.elapsed = 0
+        self.duration = duration
+        angle = extent.angle()
+        if end.y < start.y:
+            angle = 180 - angle
+        super().__init__(middle.tuple,"laser", 0)
+        self.source = source
+        self.rotation = -angle
+        destroy(start.rect(end))
+        
+    def update(self, deltatime):
+        self.elapsed += deltatime
+        if self.elapsed >= self.duration:
+            self.delete()
 
 class Hydrant(Sprite):
     def __init__(self, pos):
         super().__init__(pos, "hydrant")
         self.layer = 0
-        self.destroyed = False
         self.spout = None
     
     def damage(self, amount, pos):
@@ -40,7 +66,11 @@ class Hydrant(Sprite):
     def move(self, vec):
         super().move(vec)
         if self.rect.right < 0:
-            Game.active.remove(self)
+            self.destroy()
+    
+    def destroy(self):
+        super().destroy()
+        self.spout.destroy()
 
 class RelPosFinder(MouseListener):
     def __init__(self, target):
@@ -53,7 +83,7 @@ class RelPosFinder(MouseListener):
         
 
         
-def destroy(self, area):
+def destroy(area):
     for obj in Game.active.sprites:
         if hasattr(obj, "damage"):
             if area.colliderect(obj.rect):
@@ -67,6 +97,33 @@ class Circle:
     def colliderect(self, rect):
         dist = math.sqrt((rect.centerx - self.pos[0])**2 + (rect.centery - self.pos[1])**2)
         return dist < self.radius
+
+laser_length = 300
+class LaserEyes(Upgrade):
+    def __init__(self, parent, key=pygame.K_e):
+        super().__init__(parent, "Laser Eyes", (35, 24), "lasereye", 
+            "Zap!", centered=True)
+        self.key = key
+        self.keydown = False
+    
+    def handle(self, event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == self.key:
+                self.keydown =True
+                
+        if event.type == pygame.KEYUP:
+            self.keydown = False
+    
+    def update(self, deltatime):
+        if self.keydown:
+            start = Vector(self.rect.center)
+            direction = Vector(pygame.mouse.get_pos()) - start
+            end = start + direction.normalized * laser_length
+            Game.active.add(Laser(start, end))
+    
+    def move(self, vec):
+        print("Moving by", vec)
+        super().move(vec)
 
 class Skyscraper(Sprite):
     def __init__(self, pos, size, tilefile, winwidth, cb):
@@ -107,7 +164,7 @@ class Skyscraper(Sprite):
         if self.rect.right < 0:
             Game.active.remove(self)
 
-speed = 50
+speed = 100
 class Kaijuu(Sprite):
     def __init__(self, pos):
         super().__init__(pos, "kaijuu")
@@ -131,7 +188,7 @@ class Kaijuu(Sprite):
     def move(self, vec):
         #super().move(vec)
         mov = vec * -1
-        for sprite in game.sprites:
+        for sprite in Game.active.sprites:
             if hasattr(sprite, "move"):
                 if sprite is self: 
                     continue
@@ -172,7 +229,7 @@ class Generator:
         s = start
         for i in range(hydrants):
             s = s + random.randint(2, 16)
-            Game.active.add(Hydrant((s, self.ground)))
+            Game.active.add(Hydrant((s, self.ground-16)))
             s += 16
 
 def main():

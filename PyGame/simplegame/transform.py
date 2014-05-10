@@ -14,7 +14,7 @@ class Transform:
         self.rect = rect
         self.pos = Vector(pos) if pos else Vector(rect.x, rect.y)
         self.dir = Vector(0,0)
-        self.bindings = {} #{key:(axis, value)}
+        self.bindings = {} #{key:[axis, value, status]}
         self.move_cb = move_cb # Callback when moved :)
         self.children = set()
         self.centered = centered
@@ -68,7 +68,7 @@ class Transform:
     
     def add_binding(self, key, axis, value):
         print("Adding binding for {0} on {1}".format(key, axis))
-        self.bindings[key] = (axis, value)
+        self.bindings[key] = [axis, value, False]
     
     def clamp(self, rect):
         self.moveto((min(max(self.rect.left, rect.left), 
@@ -80,7 +80,8 @@ class Transform:
         # Why can this only handle two axises at once :u
         if event.type == pygame.KEYDOWN:
             if event.key in self.bindings:
-                axis, value = self.bindings[event.key]
+                axis, value, status = self.bindings[event.key]
+                self.bindings[event.key][2] = True
                 if axis == Axis.X:
                     self.dir.x += value
                 elif axis == Axis.Y:
@@ -88,11 +89,13 @@ class Transform:
             
         elif event.type == pygame.KEYUP:
             if event.key in self.bindings:
-                axis, value = self.bindings[event.key]
-                if axis == Axis.X:
-                    self.dir.x -= value
-                elif axis == Axis.Y:
-                    self.dir.y -= value  
+                axis, value, status = self.bindings[event.key]
+                if status:
+                    if axis == Axis.X:
+                        self.dir.x -= value
+                    elif axis == Axis.Y:
+                        self.dir.y -= value
+                self.bindings[event.key][2] = False
     
     def update(self, deltatime):
         self.forward(deltatime)

@@ -2,7 +2,7 @@
 # Jabok @ 10th May
 from simplegame import Sprite, Loader, Game, Vector, Clear
 from rotation import Rotatable
-from main import 
+#from main import destroy
 import pygame
 import math
 
@@ -20,58 +20,6 @@ class Upgrade(Sprite):
         print("Position:", self.pos)
         self.description = description
         self.name = name
-
-class Laser(Rotatable):
-    def __init__(self, start, end, duration=0.1):
-        self.layer = 1
-        extent = end - start
-        middle = start + extent * 0.5
-        img = Loader.load_image("laser")
-        length = int(math.floor(extent.length))
-        source = Clear((length, 8))
-        for i in range(length):
-            pos = (i*16, 0)
-            source.blit(img, pos)
-        self.elapsed = 0
-        self.duration = duration
-        angle = extent.angle()
-        if end.y < start.y:
-            angle = 180 - angle
-        super().__init__(middle.tuple,"laser", 0)
-        self.source = source
-        self.rotation = -angle
-        
-    def update(self, deltatime):
-        self.elapsed += deltatime
-        if self.elapsed >= self.duration:
-            Game.active.remove(self)
-        
-laser_length = 150
-class LaserEyes(Upgrade):
-    def __init__(self, parent, key=pygame.K_e):
-        super().__init__(parent, "Laser Eyes", (35, 24), "lasereye", 
-            "Zap!", centered=True)
-        self.key = key
-        self.keydown = False
-    
-    def handle(self, event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == self.key:
-                self.keydown =True
-                
-        if event.type == pygame.KEYUP:
-            self.keydown = False
-    
-    def update(self, deltatime):
-        if self.keydown:
-            start = Vector(self.rect.center)
-            direction = Vector(pygame.mouse.get_pos()) - start
-            end = start + direction.normalized * laser_length
-            Game.active.add(Laser(start, end))
-    
-    def move(self, vec):
-        print("Moving by", vec)
-        super().move(vec)
 
 class MissileLauncher(Upgrade):
     def __init__(self, parent, key):
