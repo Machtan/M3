@@ -38,7 +38,7 @@ class Laser(Rotatable):
         super().__init__(middle.tuple,"laser", 0)
         self.source = source
         self.rotation = -angle
-        destroy(start.rect(end))
+        destroy(Line(start, end))
         
     def update(self, deltatime):
         self.elapsed += deltatime
@@ -97,6 +97,30 @@ class Circle:
         dist = math.sqrt((rect.centerx - self.pos[0])**2 + (rect.centery - self.pos[1])**2)
         return dist < self.radius
 
+class Line:
+    def __init__(self, startpos, endpos):
+        self.start = startpos
+        self.end = endpos
+        delta = Vector(self.end) - self.start
+        self.x1 = min(startpos[0], endpos[0])
+        self.x2 = max(startpos[0], endpos[0])
+        a = delta.y / delta.x
+        b = self.start[1] - a * self.start[0]
+        self.value = lambda x: a*x + b
+    
+    def colliderect(self, rect):
+        left = self.value(rect.left)
+        if rect.right <= self.x1: return False
+        if rect.left >= self.x2: return False
+        if rect.top < left < rect.bottom: 
+            return True
+        right = self.value(rect.right)
+        if rect.top < right < rect.bottom:
+            return True
+        return False
+        
+        
+
 laser_length = 400
 class LaserEyes(Upgrade):
     def __init__(self, parent, key=pygame.K_e):
@@ -108,20 +132,13 @@ class LaserEyes(Upgrade):
     def handle(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == self.key:
-                self.keydown =True
-                
-        if event.type == pygame.KEYUP:
-            self.keydown = False
+                self.shoot_laser()
     
-    def update(self, deltatime):
-        if self.keydown:
-            start = Vector(self.rect.center)
-            direction = Vector(pygame.mouse.get_pos()) - start
-            end = start + direction.normalized * laser_length
-            Game.active.add(Laser(start, end))
-    
-    def move(self, vec):
-        super().move(vec)
+    def shoot_laser(self):
+        start = Vector(self.rect.center)
+        direction = Vector(pygame.mouse.get_pos()) - start
+        end = start + direction.normalized * laser_length
+        Game.active.add(Laser(start, end))
 
 class Skyscraper(Sprite):
     def __init__(self, pos, size, tilefile, winwidth, cb):
@@ -199,11 +216,15 @@ class Ground(Sprite):
     def __init__(self, windowsize, start=0):
         super().__init__((start, windowsize[1]-16), "ground")
         self.windowsize = windowsize
+        print("Ground added at ", self.pos)
     
     def move(self, vec):
         Sprite.move(self, vec)
         if self.rect.right < 0:
-            self.move(Vector(self.windowsize[0], 0))
+            print("Jumping!")
+            print("old:", self.pos)
+            self.move(Vector(self.windowsize[0]*2, 0))
+            print("new:", self.pos)
 
 class Generator:
     def __init__(self, ground, winwidth):
