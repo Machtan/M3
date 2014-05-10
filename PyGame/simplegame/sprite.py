@@ -3,6 +3,7 @@
 # Sprite is a simple sprite class
 from .transform import Transform, Vector
 from .loader import Loader
+from .game import Game
 import pygame
 class Sprite(Transform):
     def __init__(self, pos, imagefile, rect=None, centered=False):

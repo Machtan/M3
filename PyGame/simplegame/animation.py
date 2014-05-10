@@ -39,8 +39,8 @@ class Animation(Clear):
             self.cellsize   = cellrect.size # pixels
             self.delays     = delays # in ms
             self.sheetfile  = sheetfile # path
-            self.finish_cb  = finish_cb
         
+        self.finish_cb  = finish_cb
         super().__init__(self.cellsize)
         self.time       = 0
         self.running    = False

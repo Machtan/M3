@@ -43,13 +43,14 @@ class Laser(Rotatable):
     def update(self, deltatime):
         self.elapsed += deltatime
         if self.elapsed >= self.duration:
-            self.delete()
+            self.destroy()
 
 class Hydrant(Sprite):
     def __init__(self, pos):
         super().__init__(pos, "hydrant")
         self.layer = 0
         self.spout = None
+        self.destroyed = False
     
     def damage(self, amount, pos):
         if not self.destroyed:
@@ -70,7 +71,7 @@ class Hydrant(Sprite):
     
     def destroy(self):
         super().destroy()
-        self.spout.destroy()
+        self.spout.stop()
 
 class RelPosFinder(MouseListener):
     def __init__(self, target):
@@ -80,8 +81,6 @@ class RelPosFinder(MouseListener):
     def on_press(self, pos, button):
         rel = Vector(pos) - self.target.pos
         print("Relative distance to the target:", rel.tuple)
-        
-
         
 def destroy(area):
     for obj in Game.active.sprites:
@@ -98,7 +97,7 @@ class Circle:
         dist = math.sqrt((rect.centerx - self.pos[0])**2 + (rect.centery - self.pos[1])**2)
         return dist < self.radius
 
-laser_length = 300
+laser_length = 400
 class LaserEyes(Upgrade):
     def __init__(self, parent, key=pygame.K_e):
         super().__init__(parent, "Laser Eyes", (35, 24), "lasereye", 
@@ -122,7 +121,6 @@ class LaserEyes(Upgrade):
             Game.active.add(Laser(start, end))
     
     def move(self, vec):
-        print("Moving by", vec)
         super().move(vec)
 
 class Skyscraper(Sprite):
@@ -162,7 +160,7 @@ class Skyscraper(Sprite):
             
         super().move(vec)
         if self.rect.right < 0:
-            Game.active.remove(self)
+            self.destroy()
 
 speed = 100
 class Kaijuu(Sprite):

@@ -48,9 +48,11 @@ class Group:
     def remove(self, *sprites):
         """Removes sprites from the group"""
         for sprite in sprites:
-            self.sprites[sprite.layer].remove(sprite)
-            if hasattr(sprite, "remove"):
-                sprite.remove()
+            con = self.sprites[sprite.layer]
+            if sprite in con:
+                con.remove(sprite)
+                if hasattr(sprite, "remove"):
+                    sprite.remove()
     
     def clear(self):
         """Clears the group"""
