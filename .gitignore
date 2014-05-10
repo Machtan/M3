@@ -5,6 +5,8 @@
 *.sln
 *.pxi
 *.pxa
-*.pxi.meta
-*.pxa.meta
+*.userprefs
 *.meta
+*.userprefs
+*.userprefs
+*.userprefs

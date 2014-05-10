@@ -3,14 +3,25 @@ using System.Collections;
 
 public class MoveScript : MonoBehaviour {
 
-	public float moveSpeed = 10; // Units per second
+	public float moveSpeed = 80; // Units per second
 	public Vector2 velocity = new Vector2(0,0);
+	private Animator animator;
+	//private Renderer renderer;
 	private bool leftDown = false;
 	private bool rightDown = false;
 
 	// Use this for initialization
 	void Start () {
-	
+		animator = this.GetComponent<Animator>();
+		Debug.Log (animator);
+	}
+
+	void setWalkAnimation(bool on) {
+		if (on) {
+			animator.SetBool("Walking", true);
+		} else {
+			animator.SetBool ("Walking", false);
+		}
 	}
 	
 	// Update is called once per frame
@@ -31,7 +42,13 @@ public class MoveScript : MonoBehaviour {
 			rightDown = false;
 			velocity.x -= moveSpeed;
 		}
-
-		transform.Translate(velocity*Time.deltaTime);
+		if (velocity != Vector2.zero) {
+			if (!animator.GetBool("Walking")) {
+				setWalkAnimation (true);
+			}
+			transform.Translate(velocity*Time.deltaTime);
+		} else if (animator.GetBool ("Walking")) {
+			setWalkAnimation (false);
+		}
 	}
 }
