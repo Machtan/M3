@@ -1,4 +1,4 @@
-from simplegame import Game, Transform, Axis, Loader, Vector, Animation
+from simplegame import Game, Transform, Axis, Loader, Vector, Animation, Sprite
 from rotation import Rotatable
 import pygame
 import os
@@ -30,7 +30,37 @@ class SmallExplosion(Transform):
 	
 	def render(self, surf):
 		surf.blit(self.image, self.drawpos)
+
+shoot_delay = 3
+class Tank(Sprite):
+	def __init__(self, pos):
+		super().__init__(pos, "tank")
+		self.elapsed = 0
 		
+	def update(self, deltatime):
+		self.elapsed += deltatime
+		if self.elapsed >= shoot_delay:
+			mis = Missile(self.pos,(-5.8,-4.8))
+			game.add(mis)
+			self.elapsed -= shoot_delay
+		
+shoot_delay = 2
+class Helicopter(Sprite):
+	def __init__(self, pos):
+		super().__init__(pos, "helekopter")
+		cb = lambda: Game.active.remove(self)
+		self.image = Animation("resources/helekopter", finish_cb=cb).play(True)
+		self.elapsed = 0
+		
+	def render(self, surf):
+		surf.blit(self.image, self.drawpos)
+		
+	def update(self, deltatime):
+		self.elapsed += deltatime
+		if self.elapsed >= shoot_delay:
+			mis = Missile(self.pos,(-5.8,-4.8))
+			game.add(mis)
+			self.elapsed -= shoot_delay
 
 		
 def main():
@@ -43,6 +73,9 @@ def main():
 	game.add(mis)
 	mis = Missile((90,190),(6.2,-5.2))
 	game.add(mis)
+	mis = Helicopter((500,100))
+	game.add(mis)
+	game.add(Tank((500,500)))
 	game.run()
 	
 if __name__=="__main__":
