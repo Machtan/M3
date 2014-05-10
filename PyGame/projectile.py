@@ -27,7 +27,7 @@ class Missile(Rotatable):
 		self.explode()
 		
 	def explode(self):
-		mis = SmallExplosion(self.pos)
+		mis = SmallExplosion(self.pos - (32,32))
 		Game.active.add(mis)
 		self.destroy()
 
@@ -60,8 +60,7 @@ class Tank(Sprite):
 class Helicopter(Sprite):
 	def __init__(self, pos):
 		super().__init__(pos, "helekopter")
-		cb = lambda: Game.active.remove(self)
-		self.image = Animation("resources/helekopter", finish_cb=cb).play(True)
+		self.image = Animation("resources/helekopter").play(True)
 		self.elapsed = 0
 		self.shoot_delay = 2
 		self.vec = Vector(0,0.5)
