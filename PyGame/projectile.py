@@ -1,4 +1,4 @@
-from simplegame import Game, Transform, Axis, Loader, Vector
+from simplegame import Game, Transform, Axis, Loader, Vector, Animation
 from rotation import Rotatable
 import pygame
 import os
@@ -21,9 +21,22 @@ class Missile(Rotatable):
 		self.pos += self.vec
 		self.vec += gravity
 
+		
+class SmallExplosion(Transform):
+	def __init__(self, pos):
+		super().__init__(pygame.Rect(0,0,0,0), pos=pos)
+		cb = lambda: Game.active.remove(self)
+		self.image = Animation("resources/smallExp", finish_cb=cb).play(True)
+	
+	def render(self, surf):
+		surf.blit(self.image, self.drawpos)
+		
+
+		
 def main():
 	size = (800, 600)
 	game = Game(size, "Kaijuu Game")
+	game.add(SmallExplosion((100,100)))
 	mis = Missile((110,210),(5.8,-4.8))
 	game.add(mis)
 	mis = Missile((100,200),(6,-5))

@@ -1,0 +1,19 @@
+sheetfile: smallExp.png
+cellsize: 
+    - 62 #width
+    - 62 #height
+startpos:
+    - 0 #x
+    - 0 #y
+delays:
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
