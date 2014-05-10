@@ -20,62 +20,74 @@ class Missile(Rotatable):
 		self.rotation = angle
 		self.pos += self.vec
 		self.vec += gravity
+		if self.pos.y > 550:
+			self.explode()
+			
+	def damage(self, amount, pos):
+		self.explode()
+		
+	def explode(self):
+		mis = SmallExplosion(self.pos)
+		Game.active.add(mis)
+		self.destroy()
 
 		
 class SmallExplosion(Transform):
 	def __init__(self, pos):
-		super().__init__(pygame.Rect(0,0,0,0), pos=pos)
+		super().__init__(pygame.Rect(0,0,0,0), pos=pos, centered=True)
 		cb = lambda: Game.active.remove(self)
-		self.image = Animation("resources/smallExp", finish_cb=cb).play(True)
+		self.image = Animation("resources/smallExp", finish_cb=cb).play()
 	
 	def render(self, surf):
 		surf.blit(self.image, self.drawpos)
 
-shoot_delay = 3
 class Tank(Sprite):
 	def __init__(self, pos):
 		super().__init__(pos, "tank")
 		self.elapsed = 0
+		self.shoot_delay = 3
 		
 	def update(self, deltatime):
 		self.elapsed += deltatime
-		if self.elapsed >= shoot_delay:
-			mis = Missile(self.pos,(-5.8,-4.8))
-			game.add(mis)
-			self.elapsed -= shoot_delay
+		if self.elapsed >= self.shoot_delay:
+			mis = Missile(self.pos + (10,15),(-5.8,-3.8))
+			Game.active.add(mis)
+			self.elapsed -= self.shoot_delay
+			
+	def damage(self, amount, pos):
+		self.destroy()
 		
-shoot_delay = 2
 class Helicopter(Sprite):
 	def __init__(self, pos):
 		super().__init__(pos, "helekopter")
 		cb = lambda: Game.active.remove(self)
 		self.image = Animation("resources/helekopter", finish_cb=cb).play(True)
 		self.elapsed = 0
+		self.shoot_delay = 2
+		self.vec = Vector(0,0.5)
 		
 	def render(self, surf):
 		surf.blit(self.image, self.drawpos)
 		
 	def update(self, deltatime):
+		self.pos += self.vec
+	
 		self.elapsed += deltatime
-		if self.elapsed >= shoot_delay:
-			mis = Missile(self.pos,(-5.8,-4.8))
-			game.add(mis)
-			self.elapsed -= shoot_delay
-
+		if self.elapsed >= self.shoot_delay:
+			mis = Missile(self.pos + (0,32),(-8,-1))
+			Game.active.add(mis)
+			self.elapsed -= self.shoot_delay
+			self.vec = Vector(self.vec.x, -self.vec.y) 
+	
+	def damage(self, amount, pos):
+		self.destroy()
 		
 def main():
 	size = (800, 600)
 	game = Game(size, "Kaijuu Game")
-	game.add(SmallExplosion((100,100)))
-	mis = Missile((110,210),(5.8,-4.8))
+	mis = Helicopter((700,100))
 	game.add(mis)
-	mis = Missile((100,200),(6,-5))
-	game.add(mis)
-	mis = Missile((90,190),(6.2,-5.2))
-	game.add(mis)
-	mis = Helicopter((500,100))
-	game.add(mis)
-	game.add(Tank((500,500)))
+	game.add(Tank((700,500)))
 	game.run()
 	
 if __name__=="__main__":
