@@ -1,3 +1,5 @@
 *.pyc
 *.userprefs
 *.cpython-33.pyc
+simplegame/__pycache__/
+__pycache__/

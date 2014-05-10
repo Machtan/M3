@@ -46,7 +46,7 @@ class Transform:
         if self.move_cb:
             self.move_cb()
     
-    def add(self, key, axis, value):
+    def add_binding(self, key, axis, value):
         print("Adding binding for {0} on {1}".format(key, axis))
         self.bindings[key] = (axis, value)
     
