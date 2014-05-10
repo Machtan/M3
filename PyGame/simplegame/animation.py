@@ -16,7 +16,7 @@ class Animation(Clear):
         for anim in Animation.active:
             anim.progress(deltatime)
     
-    def __init__(self, sheetfile, cellrect=None, delays=None, clear_color=None):
+    def __init__(self, sheetfile, cellrect=None, delays=None, clear_color=None, finish_cb=lambda:None):
         """Creates a new information. The sheetfile is a path to the file
         containing a strip of images to use for this animation. The cellrect
         contains how big each cell in the animation is, and where in the
@@ -39,6 +39,7 @@ class Animation(Clear):
             self.cellsize   = cellrect.size # pixels
             self.delays     = delays # in ms
             self.sheetfile  = sheetfile # path
+            self.finish_cb  = finish_cb
         
         super().__init__(self.cellsize)
         self.time       = 0
@@ -112,6 +113,7 @@ class Animation(Clear):
                     self.set_frame(self.frame)
                     if not self.loop:
                         self.running = False
+                        self.finish_cb()
 
 
             

@@ -5,13 +5,18 @@ from .transform import Transform
 from .loader import Loader
 import pygame
 class Sprite(Transform):
-    def __init__(self, pos, imagefile, rect=None):
+    def __init__(self, pos, imagefile, rect=None, centered=False):
         if imagefile:
             self.image = Loader.load_image(imagefile)
         else:
             self.image = pygame.Surface((0,0))
-        self.rect = rect if rect else pygame.Rect(pos, self.image.get_size())
-        Transform.__init__(self, self.rect, pos=pos)
+        if rect: 
+            self.rect = rect 
+        else:
+            self.rect = pygame.Rect(pos, self.image.get_size())
+            if centered:
+                self.rect.center = pos
+        Transform.__init__(self, self.rect, pos=pos, centered=centered)
     
     def render(self, surf):
         surf.blit(self.image, self.drawpos)
