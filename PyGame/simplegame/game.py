@@ -3,6 +3,7 @@
 import pygame
 from .group import Group
 from .jukebox import Jukebox
+from .animation import Animation
 import os
 __doc__ = \
 """
@@ -29,7 +30,8 @@ class Game:
             except:
                 print("Bad iconfile: '{0}'".format(iconfile))
         self.win = pygame.display.set_mode(winsize)
-        pygame.display.set_caption(title)        
+        pygame.display.set_caption(title)      
+        self.add(Animation)  
         print("Application initialized!")
     
     def _run_queue(self):

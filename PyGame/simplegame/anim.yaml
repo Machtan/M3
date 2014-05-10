@@ -1,0 +1,12 @@
+sheetfile: colorsheet.png
+cellsize: 
+    - 64 #width
+    - 64 #height
+startpos:
+    - 0 #x
+    - 0 #y
+delays:
+    - 100
+    - 100
+    - 100
+    - 100

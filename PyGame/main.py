@@ -28,6 +28,15 @@ class Kaijuu(Transform):
                 
 
 def main():
+    """
+    For at et objekt opdateres: definer 'update(self, deltatime)'
+    For at et objekt renderes: definer 'render(self, surf)'
+    For at et object modtager events: definer 'handle(self, event)'
+    
+    For at kalde en metode i superklassen: ex Transform.render(self, surf)
+    
+    
+    """
     size = (800,600)
     game = Game(size, "Kaijuu Game")
     game.add(Kaijuu((0,0)))
