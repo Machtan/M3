@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Building : MonoBehaviour {
+public class Building : MonoBehaviour, IColiderResponse {
 
 	public Transform BuildingBlock;
 	private int blockSide = 16;
@@ -28,10 +28,19 @@ public class Building : MonoBehaviour {
 
 				t.parent = transform;
 			}
+
+		Colider c = gameObject.AddComponent("Colider") as Colider;
+		c.setColider(new Vector2(0, height * blockSide), width * blockSide, height * blockSide, this );
+
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	
+	}
+
+	public void gotHit(Vector2 _point)
+	{
+
 	}
 }
