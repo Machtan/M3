@@ -10,12 +10,16 @@ class Axis:
 
 class Transform:
     """Represents an object's position and movement"""
-    def __init__(self, rect, move_cb=None):
+    def __init__(self, rect, pos=None, move_cb=None):
         self.rect = rect
-        self.pos = Vector(rect.x, rect.y)
+        self.pos = Vector(pos) if pos else Vector(rect.x, rect.y)
         self.dir = Vector(0,0)
         self.bindings = {} #{key:(axis, value)}
         self.move_cb = move_cb # Callback when moved :)
+    
+    @property
+    def drawpos(self):
+        return self.pos.tuple
     
     def move(self, vec):
         """Moves the transform by the given vector"""
@@ -43,6 +47,7 @@ class Transform:
             self.move_cb()
     
     def add(self, key, axis, value):
+        print("Adding binding for {0} on {1}".format(key, axis))
         self.bindings[key] = (axis, value)
     
     def clamp(self, rect):
@@ -51,7 +56,7 @@ class Transform:
             min(max(self.rect.top, rect.top), 
                 rect.bottom-self.rect.height)))
     
-    def on(self, event):
+    def handle(self, event):
         # Why can this only handle two axises at once :u
         if event.type == pygame.KEYDOWN:
             if event.key in self.bindings:
@@ -68,3 +73,7 @@ class Transform:
                     self.dir.x -= value
                 elif axis == Axis.Y:
                     self.dir.y -= value  
+    
+    def update(self, deltatime):
+        if self.dir.x + self.dir.y:
+            self.move(self.dir*deltatime)
