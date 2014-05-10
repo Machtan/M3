@@ -11,6 +11,8 @@ from .gui import *
 from .group import *
 from .jukebox import Jukebox
 from .animation import Animation
+from .sprite import Sprite
+from .loader import Loader
 
 # Clean the namespace again :)
 del game
@@ -24,6 +26,8 @@ del dragable
 del group
 del jukebox
 del animation
+del sprite
+del loader
 # gui # Keep gui in the namespace for finding the relevant classes :)
 
 del pygame

@@ -1,28 +1,33 @@
 
 
-from simplegame import Game, Transform, Axis, Animation
+from simplegame import Game, Transform, Axis, Animation, Sprite
 import pygame
 import os
 
 
-def load_image(path):
-    if not path.endswith(".png"):
-        path += ".png"
-    if not "resources" in path:
-        path = os.path.join("resources", path)
-    image = pygame.image.load(path)
-    image.convert()
-    return image
+
+
+
+
+class DestructibleBlock(Sprite):
+    def __init__(self, pos, tilefile):
+        super().__init__(pos, tilefile)
+        
+
+class Scyscraper(Transform):
+    def __init__(self, pos, size, tilefile):
+        self.tiles = []
+        for x in range(size[0]):
+            for y in range(size[1]):
+                pass
 
 speed = 100
-class Kaijuu(Transform):
+class Kaijuu(Sprite):
     def __init__(self, pos):
-        self.still_image = load_image("kaijuu")
-        self.image = self.still_image
-        self.rect = self.image.get_rect()
-        Transform.__init__(self, self.rect, pos)
-        self.add(pygame.K_RIGHT, Axis.X, speed)
-        self.add(pygame.K_LEFT, Axis.X, -speed)
+        super().__init__(pos, "kaijuu")
+        self.still_image = self.image
+        self.add_binding(pygame.K_RIGHT, Axis.X, speed)
+        self.add_binding(pygame.K_LEFT, Axis.X, -speed)
         self.walking = False
     
     def update(self, deltatime):
@@ -35,9 +40,6 @@ class Kaijuu(Transform):
             if self.walking:
                 self.walking = False
                 self.image.stop(self.still_image)
-    
-    def render(self, surf):
-        surf.blit(self.image, self.drawpos)
                 
 
 def main():
