@@ -16,7 +16,7 @@ class Animation(Clear):
         for anim in Animation.active:
             anim.progress(deltatime)
     
-    def __init__(self, sheetfile, cellrect=None, delays=None):
+    def __init__(self, sheetfile, cellrect=None, delays=None, clear_color=None):
         """Creates a new information. The sheetfile is a path to the file
         containing a strip of images to use for this animation. The cellrect
         contains how big each cell in the animation is, and where in the
@@ -47,6 +47,8 @@ class Animation(Clear):
         if not os.path.exists(self.sheetfile):
             self.sheetfile = os.path.join(os.path.dirname(sheetfile), self.sheetfile)
         self.source     = pygame.image.load(self.sheetfile)
+        if clear_color:
+            self.source.set_colorkey(clear_color)
         self.source.convert_alpha()
         self.convert_alpha()
         self.set_frame(0)

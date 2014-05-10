@@ -3,5 +3,5 @@
 *.pxa
 *.pxi
 *.cpython-33.pyc
-/PyGame/simplegame/__pycache__/
+PyGame/simplegame/__pycache__/
 PyGame/__pycache__/

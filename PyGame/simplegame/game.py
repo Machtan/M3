@@ -12,6 +12,7 @@ environment in PyGame.
 """
 
 class Game:
+    active = None
     """Game is a simple initializer and main 
     loop for small PyGame applications"""
     def __init__(self, winsize=(550, 400), title="Application", iconfile="", color=(255,255,255)):
@@ -32,6 +33,7 @@ class Game:
         self.win = pygame.display.set_mode(winsize)
         pygame.display.set_caption(title)      
         self.add(Animation)  
+        Game.active = self
         print("Application initialized!")
     
     def _run_queue(self):
