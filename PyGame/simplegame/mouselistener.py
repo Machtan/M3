@@ -23,6 +23,8 @@ class MouseListener:
     def __init__(self):
         self._mouse_state = {} # (pressed, startpos, dragging)
         self._hovered = False
+        if not hasattr(self, "rect"):
+            setattr(self, "rect", pygame.display.get_surface().get_rect())
     
     @property
     def _dragging(self):

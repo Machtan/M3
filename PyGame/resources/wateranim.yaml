@@ -1,0 +1,12 @@
+sheetfile: waterspoutanim.png
+cellsize: 
+    - 16 #width
+    - 64 #height
+startpos:
+    - 0 #x
+    - 0 #y
+delays:
+    - 180
+    - 180
+    - 180
+    - 180

@@ -16,6 +16,7 @@ class Transform:
         self.dir = Vector(0,0)
         self.bindings = {} #{key:(axis, value)}
         self.move_cb = move_cb # Callback when moved :)
+        self.children = []
     
     @property
     def drawpos(self):
@@ -29,6 +30,12 @@ class Transform:
         self.rect.y = round(self.pos.y)
         if self.move_cb:
             self.move_cb()
+        for child in self.children:
+            child.move(vec)
+    
+    def add_child(self, child):
+        """Adds a child to the transform"""
+        self.children.append(child)
     
     def forward(self, factor=1, limit=None):
         """Moves the transform forward based on its velocity"""
@@ -40,11 +47,15 @@ class Transform:
     def moveto(self, pos):
         """Moves the transform to a specific position"""
         if pos == self.pos: return
+        delta = Vector(pos) - self.pos
         self.pos = Vector(pos)
         self.rect.x = round(self.pos.x)
         self.rect.y = round(self.pos.y)
         if self.move_cb:
             self.move_cb()
+        for child in self.children:
+            child.move(delta)
+        
     
     def add_binding(self, key, axis, value):
         print("Adding binding for {0} on {1}".format(key, axis))

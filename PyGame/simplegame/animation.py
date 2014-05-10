@@ -44,7 +44,8 @@ class Animation(Clear):
         self.time       = 0
         self.running    = False
         self.loop       = False 
-        self.sheetfile  = os.path.join(os.path.dirname(sheetfile), self.sheetfile)
+        if not os.path.exists(self.sheetfile):
+            self.sheetfile = os.path.join(os.path.dirname(sheetfile), self.sheetfile)
         self.source     = pygame.image.load(self.sheetfile)
         self.source.convert_alpha()
         self.convert_alpha()
