@@ -7,13 +7,6 @@ import math
 degconv = 180/math.pi
 gravity = Vector(0,0.1)
 
-def angelBetweenVektors(other)
-	degconv = 180/math.pi
-	prikProdukt = (self.vec.x * other.x) + (self.vec.y * other.y)
-	thisLength = math.sqrt(self.vec.x**2 + self.vec.y**2)
-	otherLength = math.sqrt(other.x**2 + other.y**2)
-	return math.acos(prikProdukt/(thisLength * otherLength)) * degconv
-
 class Missile(Rotatable):
 	def __init__(self, pos, vec):
 		super().__init__(pos, "missile", 0)
@@ -31,11 +24,11 @@ class Missile(Rotatable):
 def main():
 	size = (800, 600)
 	game = Game(size, "Kaijuu Game")
-	mis = Missile((100,200),(4.5,-4.8))
+	mis = Missile((110,210),(5.8,-4.8))
 	game.add(mis)
-	mis = Missile((100,200),(5.5,-5.2))
+	mis = Missile((100,200),(6,-5))
 	game.add(mis)
-	mis = Missile((100,200),(5,-5))
+	mis = Missile((90,190),(6.2,-5.2))
 	game.add(mis)
 	game.run()
 	
