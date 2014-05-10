@@ -4,7 +4,7 @@ import yaml
 import os
 import pygame
 import math
-from simplegame import Game, Clear, Dragable
+from .drawutils import Clear
 
 class Animation(Clear):
     """A spritesheet-based animation class"""
@@ -67,11 +67,13 @@ class Animation(Clear):
         dx = (self.startpos[0] + frame*self.cellsize[0])
         x = dx % sw
         y = self.startpos[1] + math.floor(dx/sw) * self.cellsize[1]
+        if (y >= self.source.get_height()):
+            y -= self.source.get_height();
         rect = pygame.Rect((x, y), self.cellsize)
         self.clear()
         self.blit(self.source, (0,0), rect)
     
-    def start(self, loop=False):
+    def play(self, loop=False):
         """Starts the animation"""
         self.running = True
         self.loop = loop
@@ -82,13 +84,16 @@ class Animation(Clear):
         """Pauses the animation"""
         self.running = False
     
-    def stop(self):
+    def stop(self, stopimage=None):
         """Stops the animation"""
         if self.running:
             self.running = False
             Animation.active.remove(self) # unregister for updates
         self.time = 0
         self.set_frame(0)
+        if stopimage:
+            self.clear()
+            self.blit(stopimage, (0,0))
     
     def progress(self, deltatime):
         """Updates the animation"""
@@ -104,16 +109,20 @@ class Animation(Clear):
                     if not self.loop:
                         self.running = False
 
-class Animated(Dragable):
-    def __init__(self, pos, animfile):
-        super().__init__()
-        self.image = Animation(animfile).start(True)
-        self.rect = pygame.Rect(pos, self.image.get_size())
-    
-    def render(self, surf):
-        surf.blit(self.image, self.rect)
+
             
 def main():
+    from simplegame import Game, Dragable
+    
+    class Animated(Dragable):
+        def __init__(self, pos, animfile):
+            super().__init__()
+            self.image = Animation(animfile).play(True)
+            self.rect = pygame.Rect(pos, self.image.get_size())
+    
+        def render(self, surf):
+            surf.blit(self.image, self.rect)
+    
     game = Game((600, 500), "Animation test :)")
     
     game.add(Animation)

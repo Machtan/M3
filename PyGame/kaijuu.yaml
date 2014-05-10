@@ -1,0 +1,12 @@
+sheetfile: resources/kaijuuwalk.png
+cellsize: 
+    - 64 #width
+    - 192 #height
+startpos:
+    - 64 #x
+    - 0 #y
+delays:
+    - 250
+    - 250
+    - 250
+    - 250

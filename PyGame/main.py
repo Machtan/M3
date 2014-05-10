@@ -1,6 +1,6 @@
 
 
-from simplegame import Game, Transform, Axis
+from simplegame import Game, Transform, Axis, Animation
 import pygame
 import os
 
@@ -17,11 +17,24 @@ def load_image(path):
 speed = 100
 class Kaijuu(Transform):
     def __init__(self, pos):
-        self.image = load_image("kaijuu")
+        self.still_image = load_image("kaijuu")
+        self.image = self.still_image
         self.rect = self.image.get_rect()
         Transform.__init__(self, self.rect, pos)
         self.add(pygame.K_RIGHT, Axis.X, speed)
         self.add(pygame.K_LEFT, Axis.X, -speed)
+        self.walking = False
+    
+    def update(self, deltatime):
+        Transform.update(self, deltatime)
+        if self.dir.x:
+            if not self.walking:
+                self.walking = True
+                self.image = Animation("kaijuu").play(True)
+        else:
+            if self.walking:
+                self.walking = False
+                self.image.stop(self.still_image)
     
     def render(self, surf):
         surf.blit(self.image, self.drawpos)
