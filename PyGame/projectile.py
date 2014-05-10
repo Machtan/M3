@@ -26,7 +26,7 @@ class SmallExplosion(Transform):
 	def __init__(self, pos):
 		super().__init__(pygame.Rect(0,0,0,0), pos=pos)
 		cb = lambda: Game.active.remove(self)
-		self.image = Animation("resources/smallExp", finish_cb=cb).play(True)
+		self.image = Animation("resources/smallExp", finish_cb=cb).play()
 	
 	def render(self, surf):
 		surf.blit(self.image, self.drawpos)
@@ -40,8 +40,8 @@ class Tank(Sprite):
 	def update(self, deltatime):
 		self.elapsed += deltatime
 		if self.elapsed >= shoot_delay:
-			mis = Missile(self.pos,(-5.8,-4.8))
-			game.add(mis)
+			mis = Missile(self.pos + (10,15),(-5.8,-3.8))
+			Game.active.add(mis)
 			self.elapsed -= shoot_delay
 		
 shoot_delay = 2
@@ -58,8 +58,8 @@ class Helicopter(Sprite):
 	def update(self, deltatime):
 		self.elapsed += deltatime
 		if self.elapsed >= shoot_delay:
-			mis = Missile(self.pos,(-5.8,-4.8))
-			game.add(mis)
+			mis = Missile(self.pos + (0,32),(-8,-1))
+			Game.active.add(mis)
 			self.elapsed -= shoot_delay
 
 		
