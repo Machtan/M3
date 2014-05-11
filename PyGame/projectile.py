@@ -50,8 +50,8 @@ class SmallExplosion(Transform):
 class Tank(Sprite):
 	def __init__(self, pos):
 		super().__init__(pos, "tank")
-		self.elapsed = 2.5
-		self.shoot_delay = 3
+		self.elapsed = 2
+		self.shoot_delay = 2.5
 		
 	def update(self, deltatime):
 		self.elapsed += deltatime
@@ -81,7 +81,10 @@ class Helicopter(Sprite):
 	
 		self.elapsed += deltatime
 		if self.elapsed >= self.shoot_delay:
-			mis = Missile(self.pos + (0,32),(-8,-1))
+			if self.pos.x < 300 or self.pos.y < 250:
+				mis = Missile(self.pos + (0,32),(-8,1))
+			else:
+				mis = Missile(self.pos + (0,32),(-8,-1))
 			Game.active.add(mis)
 			self.elapsed -= self.shoot_delay
 			self.vec = Vector(self.vec.x, -self.vec.y) 
