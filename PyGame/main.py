@@ -1,7 +1,7 @@
 
 
 from simplegame import Game, Transform, Axis, Animation, Sprite
-from simplegame import Loader, MouseListener, Clear
+from simplegame import Loader, MouseListener, Clear, Jukebox
 from simplegame import Vector
 from upgrade import Upgrade
 from rotation import Rotatable
@@ -271,6 +271,7 @@ def main():
     game.add(monster)
     gen = Generator(ground, size[0])
     gen.start()
+    Jukebox.play("resources/234.wav")
     game.add(gen)
     """game.add(RelPosFinder(monster))
     game.add(Hydrant((400, ground-16)))
