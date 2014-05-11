@@ -17,7 +17,8 @@ class Animation(Clear):
     def update(deltatime):
         """Updates all active animations"""
         for anim in Animation.queue:
-            Animation.active.remove(anim)
+            if anim in Animation.active:
+                Animation.active.remove(anim)
         Animation.queue = []
         for anim in Animation.active:
             anim.progress(deltatime)

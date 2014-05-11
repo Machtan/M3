@@ -244,7 +244,7 @@ class Generator:
             "window", self.winwidth, self.generate)
         Game.active.add(skyscraper)
         
-        hydrants = random.randint(1, w)
+        hydrants = random.randint(0, w//2)
         s = start
         for i in range(hydrants):
             s = s + random.randint(2, 16)
