@@ -23,6 +23,7 @@ class Game:
         self.cbqueue = []
         self.default_layer = 5
         self.sprites = Group(layer=self.default_layer)
+        self.meta_objects = {}
         self.color = color
         self.running = False
         if iconfile:
@@ -32,7 +33,11 @@ class Game:
                 print("Bad iconfile: '{0}'".format(iconfile))
         self.win = pygame.display.set_mode(winsize)
         pygame.display.set_caption(title)      
-        self.add(Animation)  
+        
+        # Add meta handlers
+        self.meta_objects["animation"] = Animation
+        self.meta_objects["jukebox"] = Jukebox
+        
         Game.active = self
         print("Application initialized!")
     
@@ -59,6 +64,7 @@ class Game:
     def clear(self):
         """Clears all sprites from the game"""
         self.queue(lambda: self.sprites.clear())
+        self.meta_objects["animation"]._empty()
     
     def set_color(self, color):
         """Sets the color used to clear the background of the game"""
@@ -110,6 +116,9 @@ class Game:
                         self.sprites.handle_mouse(event)
                     else:
                         self.sprites.handle(event)
+                    for obj in self.meta_objects.values():
+                        if hasattr(obj, "handle"):
+                            obj.handle(event)
             
             if self.paused:
                 self.clock.tick(10) # tick, tock
@@ -120,6 +129,9 @@ class Game:
                 # Update
                 deltatime = self.clock.tick(60)/1000.0
                 self.sprites.update(deltatime)
+                for obj in self.meta_objects.values():
+                    if hasattr(obj, "update"):
+                        obj.update(deltatime)
             
                 # Handle removals as the result of updating
                 self._run_queue() 

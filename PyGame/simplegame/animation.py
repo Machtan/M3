@@ -14,6 +14,11 @@ class Animation(Clear):
     def _remove(anim):
         Animation.queue.append(anim)
     
+    def _empty():
+        """Clears the static animation stuff"""
+        Animation.queue = []
+        Animation.active = set()
+    
     def update(deltatime):
         """Updates all active animations"""
         for anim in Animation.queue:

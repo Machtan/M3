@@ -1,11 +1,10 @@
 
 
 from simplegame import Game, Transform, Axis, Animation, Sprite
-from simplegame import Loader, MouseListener, Clear, Jukebox
+from simplegame import Loader, MouseListener, Clear, Jukebox, KeyHandler
 from simplegame import Vector
 from upgrade import Upgrade
 from rotation import Rotatable
-from projectile import Tank, Helicopter
 import random
 import pygame
 import os
@@ -17,9 +16,10 @@ class DestructibleBlock(Sprite):
         super().__init__(pos, tilefile)
         self.destroyed = False
     
-    def damage(self, amount, pos):
+    def damage(self, amount, source, area):
         if not self.destroyed:
-            self.image = Loader.load_image("brokenwindow")
+            if area.colliderect(self.rect):
+                self.image = Loader.load_image("brokenwindow")
 
 class Laser(Rotatable):
     def __init__(self, start, end, duration=0.1):
@@ -40,7 +40,7 @@ class Laser(Rotatable):
         super().__init__(middle.tuple,"laser", 0)
         self.source = source
         self.rotation = -angle
-        destroy(Line(start, end))
+        destroy(Line(start, end), source)
         
     def update(self, deltatime):
         self.elapsed += deltatime
@@ -54,7 +54,7 @@ class Hydrant(Sprite):
         self.spout = None
         self.destroyed = False
     
-    def damage(self, amount, pos):
+    def damage(self, amount, source, area):
         if not self.destroyed:
             self.image = Loader.load_image("brokenhydrant")
             self.destroyed = True
@@ -84,11 +84,11 @@ class RelPosFinder(MouseListener):
         rel = Vector(pos) - self.target.pos
         print("Relative distance to the target:", rel.tuple)
         
-def destroy(area):
+def destroy(area, source):
     for obj in Game.active.sprites:
         if hasattr(obj, "damage"):
             if area.colliderect(obj.rect):
-                obj.damage(10, area)
+                obj.damage(10, source, area)
             
 class Circle:
     def __init__(self, pos, radius):
@@ -98,6 +98,16 @@ class Circle:
     def colliderect(self, rect):
         dist = math.sqrt((rect.centerx - self.pos[0])**2 + (rect.centery - self.pos[1])**2)
         return dist < self.radius
+
+class SmallExplosion(Transform):
+    def __init__(self, pos):
+        super().__init__(pygame.Rect(0,0,0,0), pos=pos, centered=True)
+        self.layer = -1
+        cb = lambda: Game.active.remove(self)
+        self.image = Animation("resources/smallExp", finish_cb=cb).play()
+    
+    def render(self, surf):
+        surf.blit(self.image, self.drawpos)
 
 class Line:
     def __init__(self, startpos, endpos):
@@ -168,10 +178,10 @@ class Skyscraper(Sprite):
         for tile in self.tiles:
             tile.render(surf)
     
-    def damage(self, amount, area):
+    def damage(self, amount, source, area):
         for tile in self.tiles:
             if area.colliderect(tile.rect):
-                tile.damage(amount, area)
+                tile.damage(amount, area, area)
     
     def move(self, vec):
         if (not self.visible) and self.rect.right < self.winwidth:
@@ -201,7 +211,7 @@ class Kaijuu(Sprite):
             if self.walking:
                 self.walking = False
                 self.image.stop(self.still_image)
-        destroy(self.rect)
+        destroy(self.rect, self)
     
     def move(self, vec):
         #super().move(vec)
@@ -258,19 +268,87 @@ class Generator:
             s = s + random.randint(2, 16)
             Game.active.add(Hydrant((s, self.ground-16)))
             s += 16
+            
+class Tank(Sprite):
+    def __init__(self, pos):
+        super().__init__(pos, "tank")
+        self.elapsed = 2
+        self.shoot_delay = 2.5
+        
+    def update(self, deltatime):
+        self.elapsed += deltatime
+        if self.elapsed >= self.shoot_delay:
+            mis = Missile(self.pos + (10,15),(-5.8,-3.8))
+            Game.active.add(mis)
+            self.elapsed -= self.shoot_delay
+            
+    def damage(self, amount, source, area):
+        mis = SmallExplosion(self.pos + (0,10))
+        Game.active.add(mis)
+        self.destroy()
 
-def main():
-    """
-    For at et objekt opdateres: definer 'update(self, deltatime)'
-    For at et objekt renderes: definer 'render(self, surf)'
-    For at et object modtager events: definer 'handle(self, event)'
+gravity = Vector(0,0.1)
+class Helicopter(Sprite):
+    def __init__(self, pos):
+        super().__init__(pos, "helekopter")
+        self.image = Animation("resources/helekopter").play(True)
+        self.elapsed = 1.5
+        self.shoot_delay = 2
+        self.vec = Vector(0,0.5)
+        
+    def render(self, surf):
+        surf.blit(self.image, self.drawpos)
+        
+    def update(self, deltatime):
+        self.pos += self.vec
     
-    For at kalde en metode i superklassen: ex Transform.render(self, surf)
+        self.elapsed += deltatime
+        if self.elapsed >= self.shoot_delay:
+            if self.pos.x < 300 or self.pos.y < 250:
+                mis = Missile(self.pos + (0,32),(-8,1))
+            else:
+                mis = Missile(self.pos + (0,32),(-8,-1))
+            Game.active.add(mis)
+            self.elapsed -= self.shoot_delay
+            self.vec = Vector(self.vec.x, -self.vec.y) 
     
+    def damage(self, amount, source, area):
+        mis = SmallExplosion(self.pos)
+        Game.active.add(mis)
+        self.destroy()
+
+class Missile(Rotatable):
+    def __init__(self, pos, vec):
+        super().__init__(pos, "missile", 0)
+        self.layer = 1
+        self.vec = Vector(vec)
     
-    """
-    size = (800,600)
-    game = Game(size, "Kaijuu Game") 
+    def update(self, deltatime):
+        if self.vec.y < 0:
+            angle = self.vec.angle()
+        else:
+            angle = 360 - self.vec.angle()
+        self.rotation = angle
+        self.pos += self.vec
+        self.vec += gravity
+        if self.pos.y > 550:
+            self.explode()
+            
+    def damage(self, amount, source, area):
+        if type(source) == Kaijuu:
+            restart()
+        self.explode()
+        
+    def explode(self):
+        mis = SmallExplosion(self.pos - (32,32))
+        Game.active.add(mis)
+        self.destroy()
+        
+size = (800,600)
+game = Game(size, "Kaijuu Game") 
+Jukebox.play("resources/234.wav", loop=True)
+def restart():
+    game.clear()
     ground = size[1]-16
     game.add(Ground(size))
     game.add(Ground(size, start=size[0]))
@@ -279,20 +357,8 @@ def main():
     game.add(monster)
     gen = Generator(ground, size[0])
     gen.start()
-    Jukebox.play("resources/234.wav")
+    game.add(KeyHandler((restart, pygame.K_r)))
     game.add(gen)
-    """game.add(RelPosFinder(monster))
-    game.add(Hydrant((400, ground-16)))
-    game.add(Hydrant((416, ground-16)))
-    game.add(Hydrant((432, ground-16)))
-    game.add(Hydrant((448, ground-16)))
-    game.add(Hydrant((500, ground-16)))
-    game.add(Skyscraper((0,  ground), (4,16), "window"))
-    game.add(Skyscraper((100,ground), (7,13), "window"))
-    game.add(Skyscraper((200,ground), (4,18), "window"))
-    game.add(Skyscraper((350,ground), (5,35), "window"))"""
-    game.run()
     
-
-if __name__ == '__main__':
-    main()
+restart()
+game.run()

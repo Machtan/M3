@@ -9,19 +9,26 @@ class _Meta(type): # Metaclass to make volume a static property of the jukebox
     volume  = property(lambda s: pymus.get_volume(),    lambda s,v: pymus.set_volume(v))
     playing = property(lambda s: pymus.get_busy(),      _donotset)
     played  = property(lambda s: pymus.get_pos(),       _donotset)
-    signal  = property(lambda s: pymus.get_endevent(),  lambda s,v: pygame.set_endevent(v))
+    signal  = property(lambda s: pymus.get_endevent(),  lambda s,v: pymus.set_endevent(v))
 
 class Jukebox(metaclass=_Meta):
     paused = False
+    loop = False
+    current = None
     if not pygame.mixer.get_init(): 
         pygame.mixer.init()
-        
-    def play(filepath, *args, **kwargs):
+    
+    endmusicevent = 57
+    
+    def play(filepath, *args, loop=False, **kwargs):
         if Jukebox.playing: Jukebox.stop()
         Jukebox.paused = False
         if not os.path.exists(filepath):
             raise FileNotFoundError("Cannot find music track at '{0}'".format(filepath))
         pymus.load(filepath)
+        Jukebox.signal = Jukebox.endmusicevent
+        Jukebox.loop = loop
+        Jukebox.current = filepath
         pymus.play(*args, **kwargs)
     def stop(): 
         Jukebox.paused = False
@@ -36,6 +43,11 @@ class Jukebox(metaclass=_Meta):
         pymus.rewind()
     def fadeout(millis): 
         pymus.fadeout(millis)
+    
+    def handle(event):
+        if event.type == Jukebox.endmusicevent:
+            if Jukebox.loop:
+                Jukebox.play(Jukebox.current, loop=True)
 
 def main():
     from simplegame import Game, KeyHandler, Label
