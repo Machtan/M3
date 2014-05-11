@@ -50,7 +50,7 @@ class SmallExplosion(Transform):
 class Tank(Sprite):
 	def __init__(self, pos):
 		super().__init__(pos, "tank")
-		self.elapsed = 0
+		self.elapsed = 2.5
 		self.shoot_delay = 3
 		
 	def update(self, deltatime):
@@ -69,7 +69,7 @@ class Helicopter(Sprite):
 	def __init__(self, pos):
 		super().__init__(pos, "helekopter")
 		self.image = Animation("resources/helekopter").play(True)
-		self.elapsed = 0
+		self.elapsed = 1.5
 		self.shoot_delay = 2
 		self.vec = Vector(0,0.5)
 		

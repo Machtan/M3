@@ -249,8 +249,8 @@ class Generator:
         if random.randint(0,2) == 0:
 	        Game.active.add(Tank((start, self.ground-64)))
 			
-        if random.randint(0,2) == 0:
-            Game.active.add(Helicopter((start, 200)))
+        if random.randint(0,3) == 0:
+            Game.active.add(Helicopter((start, 200 + random.randint(0,200))))
         
         hydrants = random.randint(0, w//2)
         s = start
