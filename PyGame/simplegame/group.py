@@ -30,8 +30,8 @@ class Group:
     def size(self):
         """Returns the amount of sprites kept in the group"""
         s = 0
-        for layer in self.sprites:
-            s += len(layer)
+        for layer, sprites in self.sprites:
+            s += len(sprites)
         return s
     
     def add(self, *sprites):
