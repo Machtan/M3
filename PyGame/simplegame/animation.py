@@ -10,9 +10,15 @@ class Animation(Clear):
     """A spritesheet-based animation class"""
     # Static members
     active = set()
+    queue = []
+    def _remove(anim):
+        Animation.queue.append(anim)
     
     def update(deltatime):
         """Updates all active animations"""
+        for anim in Animation.queue:
+            Animation.active.remove(anim)
+        Animation.queue = []
         for anim in Animation.active:
             anim.progress(deltatime)
     
@@ -88,12 +94,13 @@ class Animation(Clear):
     def pause(self):
         """Pauses the animation"""
         self.running = False
+        Animation._remove(self)
     
     def stop(self, stopimage=None):
         """Stops the animation"""
         if self.running:
             self.running = False
-            Animation.active.remove(self) # unregister for updates
+        Animation._remove(self) # unregister for updates
         self.time = 0
         self.set_frame(0)
         if stopimage:
@@ -113,6 +120,7 @@ class Animation(Clear):
                     self.set_frame(self.frame)
                     if not self.loop:
                         self.running = False
+                        Animation._remove(self)
                         self.finish_cb()
 
 
