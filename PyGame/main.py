@@ -229,15 +229,15 @@ class Ground(Sprite):
     def __init__(self, windowsize, start=0):
         super().__init__((start, windowsize[1]-16), "ground")
         self.windowsize = windowsize
-        print("Ground added at ", self.pos)
+        #print("Ground added at ", self.pos)
     
     def move(self, vec):
         Sprite.move(self, vec)
         if self.rect.right < 0:
-            print("Jumping!")
-            print("old:", self.pos)
+            #print("Jumping!")
+            #print("old:", self.pos)
             self.move(Vector(self.windowsize[0]*2, 0))
-            print("new:", self.pos)
+            #print("new:", self.pos)
 
 class Generator:
     def __init__(self, ground, winwidth):
@@ -257,7 +257,10 @@ class Generator:
             "window", self.winwidth, self.generate)
         Game.active.add(skyscraper)
         if random.randint(0,2) == 0:
-	        Game.active.add(Tank((start, self.ground-64)))
+            if h < 10:
+                Game.active.add(Tank((start + 2 * 16, self.ground-64 - (h * 16))))
+            else:
+                Game.active.add(Tank((start + random.randint(0,32) , self.ground-64)))
 			
         if random.randint(0,3) == 0:
             Game.active.add(Helicopter((start, 200 + random.randint(0,200))))
@@ -272,7 +275,7 @@ class Generator:
 class Tank(Sprite):
     def __init__(self, pos):
         super().__init__(pos, "tank")
-        self.elapsed = 2
+        self.elapsed = random.randint(0,16) / 8
         self.shoot_delay = 2.5
         
     def update(self, deltatime):
@@ -292,7 +295,7 @@ class Helicopter(Sprite):
     def __init__(self, pos):
         super().__init__(pos, "helekopter")
         self.image = Animation("resources/helekopter").play(True)
-        self.elapsed = 1.5
+        self.elapsed = random.randint(0,8) / 8
         self.shoot_delay = 2
         self.vec = Vector(0,0.5)
         
@@ -300,12 +303,12 @@ class Helicopter(Sprite):
         surf.blit(self.image, self.drawpos)
         
     def update(self, deltatime):
-        self.pos += self.vec
+        self.pos += self.vec * deltatime * 50
     
         self.elapsed += deltatime
         if self.elapsed >= self.shoot_delay:
-            if self.pos.x < 300 or self.pos.y < 250:
-                mis = Missile(self.pos + (0,32),(-8,1))
+            if self.pos.x < 400 or self.pos.y < 250:
+                mis = Missile(self.pos + (0,32),(-7,1))
             else:
                 mis = Missile(self.pos + (0,32),(-8,-1))
             Game.active.add(mis)
@@ -329,8 +332,8 @@ class Missile(Rotatable):
         else:
             angle = 360 - self.vec.angle()
         self.rotation = angle
-        self.pos += self.vec
-        self.vec += gravity
+        self.pos += self.vec  * deltatime * 50
+        self.vec += gravity  * deltatime * 50
         if self.pos.y > 550:
             self.explode()
             
