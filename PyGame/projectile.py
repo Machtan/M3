@@ -7,6 +7,10 @@ import math
 degconv = 180/math.pi
 gravity = Vector(0,0.1)
 
+def debug():
+	print("Animations:", len(Animation.active))
+	print("Objects:   ", Game.active.sprites.size())
+
 class Missile(Rotatable):
 	def __init__(self, pos, vec):
 		super().__init__(pos, "missile", 0)
@@ -29,6 +33,7 @@ class Missile(Rotatable):
 	def explode(self):
 		mis = SmallExplosion(self.pos - (32,32))
 		Game.active.add(mis)
+		debug()
 		self.destroy()
 
 		
