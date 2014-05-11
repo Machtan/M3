@@ -5,10 +5,12 @@ from simplegame import Loader, MouseListener, Clear, Jukebox
 from simplegame import Vector
 from upgrade import Upgrade
 from rotation import Rotatable
+from projectile import Tank, Helicopter
 import random
 import pygame
 import os
 import math
+
 
 class DestructibleBlock(Sprite):
     def __init__(self, pos, tilefile):
@@ -142,6 +144,7 @@ class LaserEyes(Upgrade):
 
 class Skyscraper(Sprite):
     def __init__(self, pos, size, tilefile, winwidth, cb):
+        self.layer = 10
         self.tiles = []
         img = Loader.load_image(tilefile)
         x1, y1 = pos
@@ -184,7 +187,7 @@ class Kaijuu(Sprite):
     def __init__(self, pos):
         super().__init__(pos, "kaijuu")
         self.still_image = self.image
-        self.add_binding(pygame.K_RIGHT, Axis.X, speed)
+        self.dir = Vector(speed, 0)
         self.walking = False
         self.layer = 3
 
@@ -243,6 +246,11 @@ class Generator:
         skyscraper = Skyscraper((x, self.ground), (w, h), 
             "window", self.winwidth, self.generate)
         Game.active.add(skyscraper)
+        if random.randint(0,2) == 0:
+	        Game.active.add(Tank((start, self.ground-64)))
+			
+        if random.randint(0,2) == 0:
+            Game.active.add(Helicopter((start, 200)))
         
         hydrants = random.randint(0, w//2)
         s = start

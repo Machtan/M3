@@ -14,6 +14,7 @@ def debug():
 class Missile(Rotatable):
 	def __init__(self, pos, vec):
 		super().__init__(pos, "missile", 0)
+		self.layer = 1
 		self.vec = Vector(vec)
 	
 	def update(self, deltatime):
@@ -33,13 +34,13 @@ class Missile(Rotatable):
 	def explode(self):
 		mis = SmallExplosion(self.pos - (32,32))
 		Game.active.add(mis)
-		debug()
 		self.destroy()
 
 		
 class SmallExplosion(Transform):
 	def __init__(self, pos):
 		super().__init__(pygame.Rect(0,0,0,0), pos=pos, centered=True)
+		self.layer = -1
 		cb = lambda: Game.active.remove(self)
 		self.image = Animation("resources/smallExp", finish_cb=cb).play()
 	
@@ -60,6 +61,8 @@ class Tank(Sprite):
 			self.elapsed -= self.shoot_delay
 			
 	def damage(self, amount, pos):
+		mis = SmallExplosion(self.pos + (0,10))
+		Game.active.add(mis)
 		self.destroy()
 		
 class Helicopter(Sprite):
@@ -84,6 +87,8 @@ class Helicopter(Sprite):
 			self.vec = Vector(self.vec.x, -self.vec.y) 
 	
 	def damage(self, amount, pos):
+		mis = SmallExplosion(self.pos)
+		Game.active.add(mis)
 		self.destroy()
 		
 def main():
