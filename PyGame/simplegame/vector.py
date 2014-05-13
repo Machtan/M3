@@ -81,7 +81,8 @@ class Vector:
     
     def normalize(self):
         """Normalizes the vector"""
-        l = len(self)
+        l = self.length
+        if l == 0: return
         self.x /= l
         self.y /= l
     
@@ -126,7 +127,4 @@ class Vector:
         
     def __str__(self):
         return "Vector({0}, {1})".format(self.x, self.y)
-    
-    def __len__(self):
-        return int(math.floor(self.length))
     

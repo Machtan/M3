@@ -363,5 +363,5 @@ def restart():
     game.add(KeyHandler((restart, pygame.K_r)))
     game.add(gen)
     
-restart()
+start()
 game.run()
